@@ -1,0 +1,26 @@
+<h1>Show Ticker</h1>
+
+<%= if @live_action in [:edit] do %>
+  <%= live_modal @socket, InvestingWeb.TickerLive.FormComponent,
+    id: @ticker.id,
+    title: @page_title,
+    action: @live_action,
+    ticker: @ticker,
+    return_to: Routes.ticker_show_path(@socket, :show, @ticker) %>
+<% end %>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @ticker.name %>
+  </li>
+  <li>
+    <strong>Updated at:</strong>
+    <%= @ticker.updated_at %>
+  </li>
+
+</ul>
+
+<span><%= live_patch "Edit", to: Routes.ticker_show_path(@socket, :edit, @ticker), class: "button" %></span>
+<span><%= live_redirect "Back", to: Routes.ticker_index_path(@socket, :index) %></span>

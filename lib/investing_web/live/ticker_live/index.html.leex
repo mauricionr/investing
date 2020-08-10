@@ -1,0 +1,81 @@
+<h1>Carteira de investimentos</h1>
+<span><%= live_patch "Novo ativo", to: Routes.ticker_index_path(@socket, :new), class: "button" %></span>
+<%= if @live_action in [:new, :edit] do %>
+  <%= live_modal @socket, InvestingWeb.TickerLive.FormComponent,
+    id: @ticker.id || :new,
+    title: @page_title,
+    action: @live_action,
+    ticker: @ticker,
+    return_to: Routes.ticker_index_path(@socket, :index) %>
+<% end %>
+
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Ticker</th>
+      <th>Value</th>
+      <th>Variation</th>
+      <th>P/VP</th>
+      <th>DY</th>
+      <th>Next update</th>
+      <th>Last update</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="tickers">
+    <%= for ticker <- @tickers do %>
+      <tr id="ticker-<%= ticker.id %>" class="<%= ticker.type %>">
+        <td><%= ticker.type |> String.upcase %></td>
+        <td><%= ticker.name %></td>
+        <td>
+          <%= if not is_nil(ticker.value) do %>
+            R$<%= ticker.value %>
+          <% end %>
+        </td>
+        <td>
+          <%= if not is_nil(ticker.variation) do %>
+            <%= ticker.variation %>%
+            <%= if Decimal.negative?(ticker.variation) do %>
+              <span class="negative-share share-status">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill-rule="evenodd" clip-rule="evenodd"><path d="M11 21.883l-6.235-7.527-.765.644 7.521 9 7.479-9-.764-.645-6.236 7.529v-21.884h-1v21.883z"/></svg>
+              </span>
+            <% end %>
+            <%= if Decimal.positive?(ticker.variation) do %>
+              <span class="positive-share share-status">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill-rule="evenodd" clip-rule="evenodd"><path d="M11 2.206l-6.235 7.528-.765-.645 7.521-9 7.479 9-.764.646-6.236-7.53v21.884h-1v-21.883z"/></svg>
+              </span>
+            <% end %>
+          <% end %>
+        </td>
+        <td>
+          <%= if not is_nil(ticker.pvp) do %>
+            <%= ticker.pvp %>%
+          <% end %>
+        </td>
+        <td>
+          <%= if not is_nil(ticker.dividend_yield) do %>
+            <%= ticker.dividend_yield %>%
+          <% end %>
+        </td>
+        <td>
+          <%= if not is_nil(ticker.next_update) do %>
+            <%= ticker.next_update |> Timex.shift(hours: -3) |> to_datetime %>
+          <% end %>
+        </td>
+        <td>
+          <%= ticker.updated_at |> Timex.shift(hours: -3) |> to_datetime %>
+        </td>
+
+        <td>
+          <!-- <span><%= live_redirect "Show", to: Routes.ticker_show_path(@socket, :show, ticker) %></span> -->
+          <span><%= live_patch "Edit", to: Routes.ticker_index_path(@socket, :edit, ticker), class: "button" %></span>
+          <!-- <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: ticker.id, data: [confirm: "Are you sure?"] %></span> -->
+          <span><%= link "Force update", to: "#", phx_click: "force_update", phx_value_id: ticker.id, class: "button" %></span>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<span><%= live_patch "Novo ativo", to: Routes.ticker_index_path(@socket, :new), class: "button" %></span>
